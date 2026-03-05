@@ -745,10 +745,11 @@
 
     // Stats
     const stats = getCareerStats();
-    document.getElementById('statYears').textContent = stats.years;
+    const yearOfService = stats.years + 1; // year she's currently in
+    document.getElementById('statYears').textContent = yearOfService;
     document.getElementById('statMonths').textContent = stats.totalMonths;
     document.getElementById('statWorkdays').textContent = stats.weekdays.toLocaleString();
-    document.getElementById('quiltTitle').textContent = stats.years + ' Years, One Dot at a Time';
+    document.getElementById('quiltTitle').textContent = yearOfService + ' Years, One Dot at a Time';
   }
 
   // ===== RENDER CALENDAR STRIP =====
