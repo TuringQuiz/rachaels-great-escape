@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Rachael's Great Escape</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@300;400;600;700&display=swap');
+
+  :root {
+    --ink: #2c2416;
+    --ink-light: #6b5d4d;
+    --ink-faint: #b8a998;
+    --paper: #faf6f0;
+    --paper-warm: #f5ede0;
+    --paper-dark: #e8dcc8;
+    --accent-orange: #e8753a;
+    --accent-fire: #d94f30;
+    --accent-gold: #daa520;
+    --vacation-blue: #5ba4cf;
+    --vacation-bg: #e8f4f8;
+    --holiday-green: #6aab73;
+    --holiday-bg: #eef6ef;
+    --today-glow: #f5c542;
+    --done-bg: #ede8e0;
+    --future-bg: #fff8ed;
+    --soot-dark: #3a3530;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(232, 117, 58, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(218, 165, 32, 0.05) 0%, transparent 50%);
+  }
+
+  /* ===== ZONE 1: COUNTDOWN ===== */
+  .countdown-zone {
+    padding: 2rem 1.25rem 1.5rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .countdown-zone::after {
+    display: none;
+  }
+
+  .page-title {
+    font-family: 'Caveat', cursive;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--ink-light);
+    letter-spacing: 0.02em;
+    margin-bottom: 0.5rem;
+  }
+
+  .countdown-number {
+    font-family: 'Caveat', cursive;
+    font-size: 5.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--accent-orange);
+    position: relative;
+    display: inline-block;
+    padding: 0 0.15em;
+    animation: breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+  }
+
+  .countdown-label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ink-light);
+    margin-top: -0.25rem;
+    letter-spacing: 0.05em;
+    text-transform: lowercase;
+  }
+
+  .countdown-quip {
+    font-family: 'Caveat', cursive;
+    font-size: 1.2rem;
+    color: var(--ink-faint);
+    margin-top: 0.75rem;
+    font-style: italic;
+    min-height: 2em;
+    transition: opacity 0.5s;
+  }
+
+  /* Calendar strip */
+  .calendar-section {
+    padding: 1.25rem 1rem 1.5rem;
+  }
+
+  .calendar-section h2 {
+    font-family: 'Caveat', cursive;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--ink-light);
+    text-align: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .calendar-month-label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--ink-light);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 1rem;
+    margin-bottom: 0.35rem;
+    padding-left: 0.15rem;
+  }
+
+  .calendar-month-label:first-of-type {
+    margin-top: 0;
+  }
+
+  .calendar-header {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .calendar-header span {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    text-align: center;
+    padding: 2px 0;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    position: relative;
+    transition: transform 0.15s;
+  }
+
+  .cal-day.empty {
+    visibility: hidden;
+  }
+
+  .cal-day.done {
+    background: var(--done-bg);
+    color: var(--ink-faint);
+  }
+
+  .cal-day.done::after {
+    content: '';
+    position: absolute;
+    width: 65%;
+    height: 2px;
+    background: var(--ink-faint);
+    transform: rotate(-12deg);
+    border-radius: 1px;
+  }
+
+  .cal-day.today {
+    background: var(--today-glow);
+    color: var(--ink);
+    font-weight: 700;
+    box-shadow: 0 0 12px rgba(245, 197, 66, 0.5);
+    animation: pulse-today 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-today {
+    0%, 100% { box-shadow: 0 0 8px rgba(245, 197, 66, 0.4); }
+    50% { box-shadow: 0 0 18px rgba(245, 197, 66, 0.7); }
+  }
+
+  .cal-day.future {
+    background: var(--future-bg);
+    color: var(--ink);
+    border: 1.5px dashed var(--ink-faint);
+  }
+
+  .cal-day.vacation {
+    background: var(--vacation-bg);
+    color: var(--vacation-blue);
+    border: 1.5px solid rgba(91, 164, 207, 0.3);
+  }
+
+  .cal-day.vacation .day-icon {
+    font-size: 0.65rem;
+    position: absolute;
+    top: 1px;
+    right: 3px;
+  }
+
+  .cal-day.vacation.done {
+    opacity: 0.6;
+  }
+
+  .cal-day.holiday {
+    background: var(--holiday-bg);
+    color: var(--holiday-green);
+    border: 1.5px solid rgba(106, 171, 115, 0.3);
+  }
+
+  .cal-day.holiday .day-icon {
+    font-size: 0.55rem;
+    position: absolute;
+    top: 1px;
+    right: 3px;
+  }
+
+  /* Legend */
+  .calendar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--paper-dark);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
+  .legend-swatch.done { background: var(--done-bg); position: relative; }
+  .legend-swatch.done::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 15%;
+    width: 70%;
+    height: 1.5px;
+    background: var(--ink-faint);
+    transform: rotate(-12deg) translateY(-50%);
+  }
+  .legend-swatch.today { background: var(--today-glow); }
+  .legend-swatch.future { background: var(--future-bg); border: 1px dashed var(--ink-faint); }
+  .legend-swatch.vacation { background: var(--vacation-bg); border: 1px solid rgba(91,164,207,0.3); }
+  .legend-swatch.holiday { background: var(--holiday-bg); border: 1px solid rgba(106,171,115,0.3); }
+
+  /* ===== DIVIDER ===== */
+  .zone-divider {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    position: relative;
+  }
+
+  .zone-divider::before {
+    content: '';
+    display: block;
+    width: 80%;
+    height: 1px;
+    margin: 0 auto 1rem;
+    background: linear-gradient(90deg, transparent, var(--ink-faint), transparent);
+  }
+
+  .zone-divider-text {
+    font-family: 'Caveat', cursive;
+    font-size: 1.1rem;
+    color: var(--ink-faint);
+  }
+
+  /* ===== ARRIVAL PANEL ===== */
+  .arrival-panel {
+    padding: 1rem 1.25rem 0.5rem;
+    text-align: center;
+  }
+
+  .arrival-panel img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    -webkit-mask-image: radial-gradient(ellipse 90% 80% at center, black 50%, transparent 100%);
+    mask-image: radial-gradient(ellipse 90% 80% at center, black 50%, transparent 100%);
+  }
+
+  .arrival-caption {
+    font-family: 'Caveat', cursive;
+    font-size: 1rem;
+    color: var(--ink-faint);
+    margin-top: 0.5rem;
+  }
+
+  /* ===== ZONE 2: CAREER QUILT ===== */
+  .quilt-zone {
+    padding: 0.5rem 0.25rem 1.5rem;
+  }
+
+  .quilt-zone h2 {
+    font-family: 'Caveat', cursive;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ink-light);
+    text-align: center;
+    margin-bottom: 0.25rem;
+  }
+
+  .quilt-subtitle {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.7rem;
+    color: var(--ink-faint);
+    text-align: center;
+    margin-bottom: 1rem;
+    letter-spacing: 0.03em;
+  }
+
+  .quilt-container {
+    position: relative;
+  }
+
+  /* Month header row */
+  .quilt-month-headers {
+    display: grid;
+    grid-template-columns: 88px repeat(12, 1fr);
+    gap: 1px;
+    margin-bottom: 2px;
+    padding: 0 2px;
+  }
+
+  .quilt-month-headers span {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.45rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-faint);
+    text-align: center;
+  }
+
+  /* Year row */
+  .quilt-row {
+    display: grid;
+    grid-template-columns: 88px repeat(12, 1fr);
+    gap: 1px;
+    margin-bottom: 1px;
+    padding: 0 2px;
+    align-items: start;
+  }
+
+  .quilt-row.milestone-row {
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+
+  .quilt-gutter {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-right: 3px;
+    gap: 1px;
+  }
+
+  .quilt-year-label {
+    font-family: 'Caveat', cursive;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--ink-faint);
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+
+  .quilt-year-label.milestone {
+    color: var(--accent-orange);
+    font-weight: 700;
+  }
+
+  .gutter-illustration {
+    width: 80px;
+    height: auto;
+    margin-top: 2px;
+    opacity: 0.7;
+    border-radius: 4px;
+  }
+
+  .quilt-cell {
+    background: var(--paper-warm);
+    border-radius: 2px;
+    padding: 1px;
+    min-height: 8px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    justify-items: center;
+    align-items: center;
+  }
+
+  .quilt-cell.empty {
+    background: transparent;
+    display: block;
+  }
+
+  .quilt-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--ink-faint);
+    opacity: 0.5;
+  }
+
+  .quilt-dot.worked {
+    background: var(--accent-orange);
+    opacity: 0.7;
+  }
+
+  .quilt-dot.future {
+    background: var(--ink-faint);
+    opacity: 0.25;
+  }
+
+  /* ===== ZONE 3: BONFIRE ===== */
+  .bonfire-zone {
+    padding: 1.5rem 1.25rem 3rem;
+    text-align: center;
+    position: relative;
+    background: linear-gradient(180deg, var(--paper) 0%, #fdf0e0 50%, #fce4c8 100%);
+  }
+
+  .bonfire-zone::before {
+    content: '';
+    display: block;
+    width: 60%;
+    height: 1px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(90deg, transparent, var(--accent-orange), transparent);
+  }
+
+  .bonfire-title {
+    font-family: 'Caveat', cursive;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-fire);
+    margin-bottom: 1rem;
+  }
+
+  .bonfire-illustration {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    -webkit-mask-image: radial-gradient(ellipse 90% 80% at center, black 50%, transparent 100%);
+    mask-image: radial-gradient(ellipse 90% 80% at center, black 50%, transparent 100%);
+  }
+
+  /* ===== CAREER STATS BAR ===== */
+  .career-stats {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-number {
+    font-family: 'Caveat', cursive;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent-orange);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin-top: 2px;
+  }
+
+  /* Utility */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Responsive: wider screens */
+  @media (min-width: 500px) {
+    .countdown-number { font-size: 7rem; }
+    .cal-day { font-size: 0.85rem; }
+    .quilt-dot { width: 3.5px; height: 3.5px; }
+    .quilt-year-label { font-size: 0.75rem; }
+    .quilt-month-headers,
+    .quilt-row { grid-template-columns: 100px repeat(12, 1fr); }
+    .gutter-illustration { width: 92px; }
+  }
+
+  @media (min-width: 768px) {
+    body { max-width: 480px; margin: 0 auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== ZONE 1: COUNTDOWN ===== -->
+<section class="countdown-zone" aria-label="Retirement countdown">
+  <div class="page-title">Rachael's Great Escape</div>
+  <div class="countdown-number" id="countdownNumber">--</div>
+  <div class="countdown-label">work days left</div>
+  <div class="countdown-quip" id="quip"></div>
+</section>
+
+<!-- Stats -->
+<div class="zone-divider">
+  <div class="career-stats">
+    <div class="stat">
+      <div class="stat-number" id="statYears">--</div>
+      <div class="stat-label">Years</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number" id="statMonths">--</div>
+      <div class="stat-label">Months</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number" id="statWorkdays">--</div>
+      <div class="stat-label">Weekdays worked</div>
+    </div>
+  </div>
+  <div class="zone-divider-text">...and every single one of them counted</div>
+</div>
+
+<!-- ===== ARRIVAL PANEL ===== -->
+<div class="arrival-panel" id="arrivalPanel">
+  <img src="arrival.png" alt="Mini-Totoro Rachael walking toward the CT Judicial Branch building on her first day, March 15, 1999">
+</div>
+
+<!-- ===== ZONE 2: CAREER QUILT ===== -->
+<section class="quilt-zone" aria-label="Career quilt">
+  <h2>27 Years, One Dot at a Time</h2>
+  <div class="quilt-subtitle">Each dot is a weekday. Each row of 5 is a work week.</div>
+  <div class="quilt-container" id="quiltContainer"></div>
+</section>
+
+<!-- ===== THE FINAL STRETCH ===== -->
+<section class="calendar-section" aria-label="Countdown calendar">
+  <h2>The Final Stretch</h2>
+  <div id="calendarContainer"></div>
+  <div class="calendar-legend">
+    <div class="legend-item"><div class="legend-swatch done"></div>Done</div>
+    <div class="legend-item"><div class="legend-swatch today"></div>Today</div>
+    <div class="legend-item"><div class="legend-swatch future"></div>Remaining</div>
+    <div class="legend-item"><div class="legend-swatch vacation"></div>Vacation</div>
+    <div class="legend-item"><div class="legend-swatch holiday"></div>Holiday</div>
+  </div>
+</section>
+
+<!-- ===== ZONE 3: BONFIRE ===== -->
+<section class="bonfire-zone" aria-label="The grand finale">
+  <div class="bonfire-title">May 1, 2026</div>
+  <img class="bonfire-illustration" src="bonfire.png" alt="Desk bonfire celebration — soot sprites dancing, Mini-Totoro Rachael walking away with her full bindle sack toward the horizon">
+</section>
+
+<script>
+(function() {
+  // ===== CONFIGURATION =====
+  const CAREER_START = new Date(1999, 2, 15); // March 15, 1999
+  const COUNTDOWN_START = new Date(2026, 2, 2); // March 2, 2026 (first workday)
+  const LAST_WORK_DAY = new Date(2026, 3, 30); // April 30, 2026
+  const RETIREMENT_DATE = new Date(2026, 4, 1); // May 1, 2026
+
+  // Vacation: April 13-24, 2026 (weekdays only matter)
+  const VACATION_DATES = [];
+  for (let d = new Date(2026, 3, 13); d <= new Date(2026, 3, 24); d.setDate(d.getDate() + 1)) {
+    const dow = d.getDay();
+    if (dow >= 1 && dow <= 5) {
+      VACATION_DATES.push(new Date(d));
+    }
+  }
+
+  // Holidays
+  const HOLIDAYS = [
+    new Date(2026, 3, 3) // Good Friday, April 3, 2026
+  ];
+
+  const QUIPS = [
+    "The copier can smell your freedom",
+    "HR paperwork: almost someone else's problem",
+    "The parking lot will miss you. Nobody else will miss the parking lot.",
+    "Your out-of-office is about to become permanent",
+    "Somewhere, a desk is trembling",
+    "27 years of \"per my last email\" ends soon",
+    "Your alarm clock is filing for unemployment",
+    "The vending machine is planning a farewell party",
+    "IT will never have to reset your password again",
+    "That one coworker still won't know how to use the printer",
+    "Your commute is about to become walking to the kitchen",
+    "Every meeting you skip from now on is a gift to yourself",
+    "The office plants are already grieving",
+    "Reply-all can't hurt you anymore",
+    "Freedom tastes like sleeping past 6 AM",
+    "Your badge will make a great coaster",
+    "The break room microwave won't miss you. It doesn't miss anyone.",
+    "No more \"happy Monday!\" from that one person",
+    "You've attended your last mandatory fun event",
+    "Casual Friday is about to become Casual Every Day",
+  ];
+
+  // ===== UTILITY FUNCTIONS =====
+  function isWeekday(d) {
+    const dow = d.getDay();
+    return dow >= 1 && dow <= 5;
+  }
+
+  function isSameDay(a, b) {
+    return a.getFullYear() === b.getFullYear() &&
+           a.getMonth() === b.getMonth() &&
+           a.getDate() === b.getDate();
+  }
+
+  function isVacation(d) {
+    return VACATION_DATES.some(v => isSameDay(v, d));
+  }
+
+  function isHoliday(d) {
+    return HOLIDAYS.some(h => isSameDay(h, d));
+  }
+
+  function isWorkDay(d) {
+    return isWeekday(d) && !isVacation(d) && !isHoliday(d);
+  }
+
+  function today() {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+
+  function countWeekdaysInMonth(year, month, startDay, endDay) {
+    // Count weekdays in a month from startDay to endDay (1-indexed, inclusive)
+    let count = 0;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const from = startDay || 1;
+    const to = endDay || daysInMonth;
+    for (let d = from; d <= Math.min(to, daysInMonth); d++) {
+      const date = new Date(year, month, d);
+      if (isWeekday(date)) count++;
+    }
+    return count;
+  }
+
+  // ===== COUNTDOWN LOGIC =====
+  function getWorkDaysRemaining() {
+    const t = today();
+    let count = 0;
+    let d = new Date(t);
+    // If today is after last work day, return 0
+    if (d > LAST_WORK_DAY) return 0;
+    // Count from today (inclusive) to last work day
+    while (d <= LAST_WORK_DAY) {
+      if (isWorkDay(d)) count++;
+      d.setDate(d.getDate() + 1);
+    }
+    return count;
+  }
+
+  function getCareerStats() {
+    const start = CAREER_START;
+    const end = LAST_WORK_DAY;
+    let years = end.getFullYear() - start.getFullYear();
+    let months = end.getMonth() - start.getMonth();
+    if (end.getDate() < start.getDate()) months--;
+    if (months < 0) { years--; months += 12; }
+    const totalMonths = years * 12 + months;
+
+    // Count weekdays in career
+    let weekdays = 0;
+    let d = new Date(start);
+    // Approximate: ~5/7 of total days
+    const totalDays = Math.floor((end - start) / (1000 * 60 * 60 * 24));
+    const fullWeeks = Math.floor(totalDays / 7);
+    weekdays = fullWeeks * 5;
+    // Count remaining days
+    let remaining = totalDays % 7;
+    let tempDate = new Date(start);
+    tempDate.setDate(tempDate.getDate() + fullWeeks * 7);
+    for (let i = 0; i < remaining; i++) {
+      if (isWeekday(tempDate)) weekdays++;
+      tempDate.setDate(tempDate.getDate() + 1);
+    }
+
+    return { years, months, totalMonths, weekdays };
+  }
+
+  // ===== RENDER COUNTDOWN =====
+  function renderCountdown() {
+    const remaining = getWorkDaysRemaining();
+    document.getElementById('countdownNumber').textContent = remaining;
+
+    // Pick quip based on day of year for daily rotation
+    const t = today();
+    const dayOfYear = Math.floor((t - new Date(t.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+    const quipIndex = dayOfYear % QUIPS.length;
+    document.getElementById('quip').textContent = '"' + QUIPS[quipIndex] + '"';
+
+    // Stats
+    const stats = getCareerStats();
+    document.getElementById('statYears').textContent = stats.years;
+    document.getElementById('statMonths').textContent = stats.totalMonths;
+    document.getElementById('statWorkdays').textContent = stats.weekdays.toLocaleString();
+  }
+
+  // ===== RENDER CALENDAR STRIP =====
+  function renderCalendar() {
+    const container = document.getElementById('calendarContainer');
+    const t = today();
+
+    // Build weeks from March 2 to April 30, grouped by month
+    const months = [
+      { name: 'March', year: 2026, month: 2, startDate: 2 },
+      { name: 'April', year: 2026, month: 3, endDate: 30 }
+    ];
+
+    const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+
+    months.forEach(m => {
+      const label = document.createElement('div');
+      label.className = 'calendar-month-label';
+      label.textContent = m.name;
+      container.appendChild(label);
+
+      // Day name headers
+      const header = document.createElement('div');
+      header.className = 'calendar-header';
+      dayNames.forEach(dn => {
+        const span = document.createElement('span');
+        span.textContent = dn;
+        header.appendChild(span);
+      });
+      container.appendChild(header);
+
+      // Get first and last day of this countdown segment
+      const firstDay = m.startDate || 1;
+      const daysInMonth = new Date(m.year, m.month + 1, 0).getDate();
+      const lastDay = m.endDate || daysInMonth;
+
+      // Find the first Monday on or before firstDay
+      const firstDate = new Date(m.year, m.month, firstDay);
+      // Day of week: 0=Sun, 1=Mon, ... 5=Fri, 6=Sat
+      // We want Mon=col0, Tue=col1, ..., Fri=col4
+      const firstDow = firstDate.getDay(); // 0-6
+
+      const grid = document.createElement('div');
+      grid.className = 'calendar-grid';
+
+      // Map JS day (0=Sun..6=Sat) to grid column (Mon=0..Fri=4)
+      function dowToCol(dow) {
+        if (dow === 0) return -1; // Sunday
+        if (dow === 6) return -1; // Saturday
+        return dow - 1; // Mon=0, Tue=1, ..., Fri=4
+      }
+
+      // Add empty cells for offset of first day
+      const startCol = dowToCol(firstDow);
+      if (startCol > 0) {
+        for (let i = 0; i < startCol; i++) {
+          const empty = document.createElement('div');
+          empty.className = 'cal-day empty';
+          grid.appendChild(empty);
+        }
+      }
+
+      // Iterate through weekdays in range
+      for (let day = firstDay; day <= lastDay; day++) {
+        const d = new Date(m.year, m.month, day);
+        const dow = d.getDay();
+        if (dow === 0 || dow === 6) continue; // skip weekends
+
+        const cell = document.createElement('div');
+        cell.className = 'cal-day';
+
+        const dayNum = document.createElement('span');
+        dayNum.textContent = day;
+
+        if (isVacation(d)) {
+          cell.classList.add('vacation');
+          if (d < t) cell.classList.add('done');
+          const icon = document.createElement('span');
+          icon.className = 'day-icon';
+          icon.textContent = '\u{1F334}';
+          cell.appendChild(icon);
+        } else if (isHoliday(d)) {
+          cell.classList.add('holiday');
+          if (d < t) cell.classList.add('done');
+          const icon = document.createElement('span');
+          icon.className = 'day-icon';
+          icon.textContent = '\u2727';
+          cell.appendChild(icon);
+        } else if (isSameDay(d, t)) {
+          cell.classList.add('today');
+        } else if (d < t) {
+          cell.classList.add('done');
+        } else {
+          cell.classList.add('future');
+        }
+
+        cell.appendChild(dayNum);
+        grid.appendChild(cell);
+      }
+
+      container.appendChild(grid);
+    });
+  }
+
+  // ===== MILESTONE ILLUSTRATIONS =====
+  // Generated PNG images for the left gutter at milestone years
+  function getMilestoneIllustration(year) {
+    const img = document.createElement('img');
+    img.src = `desk-${year}.png`;
+    img.alt = `Desk in ${year}`;
+    img.classList.add('gutter-illustration');
+    return img;
+  }
+
+  // ===== RENDER CAREER QUILT =====
+  function renderQuilt() {
+    const container = document.getElementById('quiltContainer');
+    const t = today();
+    const monthNames = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+    const milestoneYears = [1999, 2003, 2008, 2013, 2018, 2023];
+
+    // Month headers
+    const headerRow = document.createElement('div');
+    headerRow.className = 'quilt-month-headers';
+    const yearHead = document.createElement('span');
+    yearHead.textContent = '';
+    headerRow.appendChild(yearHead);
+    monthNames.forEach(mn => {
+      const span = document.createElement('span');
+      span.textContent = mn;
+      headerRow.appendChild(span);
+    });
+    container.appendChild(headerRow);
+
+    // Year rows: 1999 to 2026
+    for (let year = 1999; year <= 2026; year++) {
+      const isMilestone = milestoneYears.includes(year);
+
+      const row = document.createElement('div');
+      row.className = 'quilt-row';
+      if (isMilestone) row.classList.add('milestone-row');
+
+      // Left gutter: year label + optional illustration
+      const gutter = document.createElement('div');
+      gutter.className = 'quilt-gutter';
+
+      const label = document.createElement('div');
+      label.className = 'quilt-year-label';
+      if (isMilestone || year === 2026) label.classList.add('milestone');
+      label.textContent = year;
+      gutter.appendChild(label);
+
+      if (isMilestone) {
+        gutter.appendChild(getMilestoneIllustration(year));
+      }
+
+      row.appendChild(gutter);
+
+      // 12 month cells
+      for (let month = 0; month < 12; month++) {
+        const cell = document.createElement('div');
+        cell.className = 'quilt-cell';
+
+        const monthStart = new Date(year, month, 1);
+        const monthEnd = new Date(year, month + 1, 0);
+
+        if (monthEnd < CAREER_START || monthStart > LAST_WORK_DAY) {
+          cell.classList.add('empty');
+          row.appendChild(cell);
+          continue;
+        }
+
+        let dayFrom = 1;
+        let dayTo = monthEnd.getDate();
+
+        if (year === CAREER_START.getFullYear() && month === CAREER_START.getMonth()) {
+          dayFrom = CAREER_START.getDate();
+        }
+        if (year === LAST_WORK_DAY.getFullYear() && month === LAST_WORK_DAY.getMonth()) {
+          dayTo = LAST_WORK_DAY.getDate();
+        }
+
+        // Create dots — the CSS grid with 5 columns automatically
+        // arranges them into work-week rows
+        for (let d = dayFrom; d <= dayTo; d++) {
+          const date = new Date(year, month, d);
+          if (!isWeekday(date)) continue;
+
+          const dot = document.createElement('div');
+          dot.className = 'quilt-dot';
+
+          if (date <= t) {
+            dot.classList.add('worked');
+          } else {
+            dot.classList.add('future');
+          }
+          cell.appendChild(dot);
+        }
+
+        row.appendChild(cell);
+      }
+
+      container.appendChild(row);
+    }
+  }
+
+  // ===== INIT =====
+  renderCountdown();
+  renderCalendar();
+  renderQuilt();
+})();
+</script>
+</body>
+</html>
