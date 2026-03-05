@@ -577,7 +577,7 @@
 
 <!-- ===== ZONE 2: CAREER QUILT ===== -->
 <section class="quilt-zone" aria-label="Career quilt">
-  <h2>27 Years, One Dot at a Time</h2>
+  <h2 id="quiltTitle">27 Years, One Dot at a Time</h2>
   <div class="quilt-subtitle">Each dot is a weekday. Each row of 5 is a work week.</div>
   <div class="quilt-container" id="quiltContainer"></div>
 </section>
@@ -705,7 +705,8 @@
 
   function getCareerStats() {
     const start = CAREER_START;
-    const end = LAST_WORK_DAY;
+    const t = today();
+    const end = t < LAST_WORK_DAY ? t : LAST_WORK_DAY;
     let years = end.getFullYear() - start.getFullYear();
     let months = end.getMonth() - start.getMonth();
     if (end.getDate() < start.getDate()) months--;
@@ -747,6 +748,7 @@
     document.getElementById('statYears').textContent = stats.years;
     document.getElementById('statMonths').textContent = stats.totalMonths;
     document.getElementById('statWorkdays').textContent = stats.weekdays.toLocaleString();
+    document.getElementById('quiltTitle').textContent = stats.years + ' Years, One Dot at a Time';
   }
 
   // ===== RENDER CALENDAR STRIP =====
